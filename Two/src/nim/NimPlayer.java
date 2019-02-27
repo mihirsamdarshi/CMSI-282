@@ -1,6 +1,7 @@
 package nim;
 
 import java.util.ArrayList;
+import java.lang.Math;
 import java.util.Map;
 
 /**
@@ -41,22 +42,22 @@ public class NimPlayer {
             return the utility score of node
         }
         if (isMax) {
-            double maxEval = Double.POSITIVE_INFINITY;
+            int maxEval = 2147483647;
             for (each child of node) {
                 int eval = alphaBetaMinimax(child, alpha, beta, false, visited);
-                maxEval = max(maxEval, eval);
-                alpha = max(alpha, eval);
+                maxEval = Math.max(maxEval, eval);
+                alpha = Math.max(alpha, eval);
                 if (beta <= alpha) {
                     break;
                 }
             }
-            return maxEval
+            return maxEval;
         } else {
-            double minEval = Double.POSITIVE_INFINITY;
+            int minEval = -2147483648;
             for (each child of node) {
                 int eval = alphaBetaMinimax(child, alpha, beta, true, visited);
-                minEval = min(minEval, eval);
-                beta = min(beta, alpha);
+                minEval = Math.min(minEval, eval);
+                beta = Math.min(beta, alpha);
                 if (beta <= alpha) {
                     break;
                 }
