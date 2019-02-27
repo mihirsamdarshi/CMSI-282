@@ -13,7 +13,6 @@ import java.util.Map;
 public class NimPlayer {
     
     private final int MAX_REMOVAL;
-    private Map<GameTreeNode, Integer> visited = new HashMap<GameTreeNode, Integer>();
     
     NimPlayer (int MAX_REMOVAL) {
         this.MAX_REMOVAL = MAX_REMOVAL;
@@ -27,7 +26,7 @@ public class NimPlayer {
      */
     public int choose (int remaining) {
     	GameTreeNode root = new GameTreeNode(remaining, 0, true);
-    	int rootScore = alphaBetaMinimax(root, Integer.MIN_VALUE, Integer.MAX_VALUE, true, visited);
+    	int rootScore = alphaBetaMinimax(root, Integer.MIN_VALUE, Integer.MAX_VALUE, true, new HashMap<GameTreeNode, Integer>());
     	if (rootScore == 1) {
     		for(GameTreeNode child: root.children) {
     			if (child.score == 1) {
