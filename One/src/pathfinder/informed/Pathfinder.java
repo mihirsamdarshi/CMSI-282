@@ -28,49 +28,49 @@ public class Pathfinder {
      * @return An ArrayList of Strings representing actions that lead from the initial to
      * the goal state, of the format: ["R", "R", "L", ...]
      */
-	public static ArrayList<String> solve (MazeProblem problem) {
+    public static ArrayList<String> solve (MazeProblem problem) {
 
-		if (problem.KEY_STATE == null) {
-			return null;
-		}
+        if (problem.KEY_STATE == null) {
+            return null;
+        }
 
-		boolean foundKey = false;
+        boolean foundKey = false;
 
-		ArrayList<String> pathSoln = new ArrayList<>();
+        ArrayList<String> pathSoln = new ArrayList<>();
 
-		for (int i = 0; i < 2; i++) {
-			MazeState startingState = foundKey ? problem.KEY_STATE : problem.INITIAL_STATE;
-			PriorityQueue<SearchTreeNode> frontier = new PriorityQueue<>();
-			HashSet<MazeState> visitedStates = new HashSet<>();
+        for (int i = 0; i < 2; i++) {
+            MazeState startingState = foundKey ? problem.KEY_STATE : problem.INITIAL_STATE;
+            PriorityQueue<SearchTreeNode> frontier = new PriorityQueue<>();
+            HashSet<MazeState> visitedStates = new HashSet<>();
 
             frontier.add(new SearchTreeNode(startingState, null, null, 0,
-            		problem.getDistance(startingState, foundKey)));
+                    problem.getDistance(startingState, foundKey)));
 
-	        while (!frontier.isEmpty()) {
-	            SearchTreeNode expanding = frontier.poll();
+            while (!frontier.isEmpty()) {
+                SearchTreeNode expanding = frontier.poll();
 
-	           if (problem.isObjective(expanding.state, foundKey)) {
-	        	   pathSoln.addAll(getPath(expanding));
+                if (problem.isObjective(expanding.state, foundKey)) {
+                    pathSoln.addAll(getPath(expanding));
 
-	        	   if (foundKey) {
-	        		   return pathSoln;
-	        	   } else {
-	        		   foundKey = true;
-		               break;
-	        	   }
-	           }
+                    if (foundKey) {
+                        return pathSoln;
+                    } else {
+                        foundKey = true;
+                        break;
+                    }
+                }
 
-	            Map<String, MazeState> transitions = problem.getTransitions(expanding.state);
-	            for (Map.Entry<String, MazeState> transition : transitions.entrySet()) {
-	            	if (visitedStates.add(transition.getValue())) {
-	            		int pastCost = expanding.pastCost + problem.getCost(transition.getValue());
-	            		int futureCost = problem.getDistance(transition.getValue(), foundKey);
-	            		frontier.add(new SearchTreeNode(transition.getValue(),
-	            				transition.getKey(), expanding, pastCost, futureCost));
-	            	}
-	            }
-	        }
-		}
+                Map<String, MazeState> transitions = problem.getTransitions(expanding.state);
+                for (Map.Entry<String, MazeState> transition : transitions.entrySet()) {
+                    if (visitedStates.add(transition.getValue())) {
+                        int pastCost = expanding.pastCost + problem.getCost(transition.getValue());
+                        int futureCost = problem.getDistance(transition.getValue(), foundKey);
+                        frontier.add(new SearchTreeNode(transition.getValue(),
+                                transition.getKey(), expanding, pastCost, futureCost));
+                    }
+                }
+            }
+        }
 
         return null;
     }
