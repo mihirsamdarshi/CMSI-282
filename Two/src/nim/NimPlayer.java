@@ -1,12 +1,14 @@
 package nim;
 
 import java.util.ArrayList;
-import java.lang.Math;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
  * Artificial Intelligence responsible for playing the game of Nim!
  * Implements the alpha-beta-pruning mini-max search algorithm
+ * @author <DiBiagio, Will>
+ * @author <Samdarshi, Mihir>
  */
 public class NimPlayer {
     
@@ -23,7 +25,16 @@ public class NimPlayer {
      *          of [1, MAX_REMOVAL]
      */
     public int choose (int remaining) {
-        throw new UnsupportedOperationException();
+    	GameTreeNode root = new GameTreeNode(remaining, 0, true);
+    	int rootScore = alphaBetaMinimax(root, Integer.MIN_VALUE, Integer.MAX_VALUE, true, new HashMap<GameTreeNode, Integer>());
+    	if (rootScore == 1) {
+    		for(GameTreeNode child: root.children) {
+    			if (child.score == 1) {
+    				return child.action;
+    			}
+    		}
+    	}
+    	return 1;
     }
     
     /**
@@ -38,36 +49,45 @@ public class NimPlayer {
      *          from the given node
      */
     private int alphaBetaMinimax (GameTreeNode node, int alpha, int beta, boolean isMax, Map<GameTreeNode, Integer> visited) {
-        if (node is a terminal node) {
-            return the utility score of node
-        }
-        if (isMax) {
-            int maxEval = 2147483647;
-            for (each child of node) {
-                int eval = alphaBetaMinimax(child, alpha, beta, false, visited);
-                maxEval = Math.max(maxEval, eval);
-                alpha = Math.max(alpha, eval);
-                if (beta <= alpha) {
-                    break;
-                }
-            }
-            return maxEval;
-        } else {
-            int minEval = -2147483648;
-            for (each child of node) {
-                int eval = alphaBetaMinimax(child, alpha, beta, true, visited);
-                minEval = Math.min(minEval, eval);
-                beta = Math.min(beta, alpha);
-                if (beta <= alpha) {
-                    break;
-                }
-            }
-            return minEval;
-        }
+        
+    	if (node.remaining == 0) {
+    		return node.score;
+    	}
+    	
+    	if (visited.containsKey(node)) {
+    		return visited.get(node);
+    	}
 
-        throw new UnsupportedOperationException();
+		node.score = isMax ? Integer.MIN_VALUE : Integer.MAX_VALUE;
+		int action = 1;
+		
+		while (action <= MAX_REMOVAL && action <= node.remaining) {
+			int newRemaining = node.remaining - action;
+			GameTreeNode childNode = new GameTreeNode(newRemaining, action, !node.isMax);
+			if (childNode.remaining == 0) {
+				childNode.score = childNode.isMax ? 0 : 1;
+			}
+			node.children.add(childNode);
+			action++;
+			
+			if (isMax) {
+    			node.score = Math.max(node.score, alphaBetaMinimax(childNode, alpha, beta, false, visited));
+    			alpha = Math.max(alpha, node.score);
+    			node.score = alpha;
+			} else {
+    			node.score = Math.min(node.score, alphaBetaMinimax(childNode, alpha, beta, true, visited));
+    			beta = Math.min(beta, node.score);
+    			node.score = beta;
+			}
+			
+			if (beta <= alpha) {
+				break;
+			}
+    	}
+
+		visited.put(node, node.score);
+		return node.score;
     }
-
 }
 
 /**
@@ -111,6 +131,16 @@ class GameTreeNode {
     @Override
     public int hashCode () {
         return remaining + ((isMax) ? 1 : 0);
+    }
+    
+    @Override
+    public String toString () {
+    	String output = "~";
+    	
+    	for (GameTreeNode child: children) {
+    		output += child.remaining;
+    	}
+    	return output;
     }
     
 }
