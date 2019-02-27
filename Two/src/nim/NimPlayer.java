@@ -37,6 +37,33 @@ public class NimPlayer {
      *          from the given node
      */
     private int alphaBetaMinimax (GameTreeNode node, int alpha, int beta, boolean isMax, Map<GameTreeNode, Integer> visited) {
+        if (node is a terminal node) {
+            return the utility score of node
+        }
+        if (isMax) {
+            double maxEval = Double.POSITIVE_INFINITY;
+            for (each child of node) {
+                int eval = alphaBetaMinimax(child, alpha, beta, false, visited);
+                maxEval = max(maxEval, eval);
+                alpha = max(alpha, eval);
+                if (beta <= alpha) {
+                    break;
+                }
+            }
+            return maxEval
+        } else {
+            double minEval = Double.POSITIVE_INFINITY;
+            for (each child of node) {
+                int eval = alphaBetaMinimax(child, alpha, beta, true, visited);
+                minEval = min(minEval, eval);
+                beta = min(beta, alpha);
+                if (beta <= alpha) {
+                    break;
+                }
+            }
+            return minEval;
+        }
+
         throw new UnsupportedOperationException();
     }
 
