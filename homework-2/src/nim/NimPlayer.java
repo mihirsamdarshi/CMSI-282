@@ -13,7 +13,7 @@ import java.util.Map;
 public class NimPlayer {
     
     private final int MAX_REMOVAL;
-    
+   
     NimPlayer (int MAX_REMOVAL) {
         this.MAX_REMOVAL = MAX_REMOVAL;
     }
@@ -25,16 +25,18 @@ public class NimPlayer {
      *          of [1, MAX_REMOVAL]
      */
     public int choose (int remaining) {
-    	GameTreeNode root = new GameTreeNode(remaining, 0, true);
-    	int rootScore = alphaBetaMinimax(root, Integer.MIN_VALUE, Integer.MAX_VALUE, true, new HashMap<GameTreeNode, Integer>());
-    	if (rootScore == 1) {
-    		for(GameTreeNode child: root.children) {
-    			if (child.score == 1) {
-    				return child.action;
-    			}
-    		}
-    	}
-    	return 1;
+        GameTreeNode root = new GameTreeNode(remaining, 0, true);
+        int rootScore = alphaBetaMinimax(root, Integer.MIN_VALUE, Integer.MAX_VALUE, true, new HashMap<GameTreeNode, Integer>());
+        ArrayList<GameTreeNode> children = root.children;
+        
+        if (rootScore == 1) {
+            for(GameTreeNode child: children) {
+                if (child.score == 1) {
+                    return child.action;
+                }
+            }
+        }
+        return 1;
     }
     
     /**
@@ -49,44 +51,40 @@ public class NimPlayer {
      *          from the given node
      */
     private int alphaBetaMinimax (GameTreeNode node, int alpha, int beta, boolean isMax, Map<GameTreeNode, Integer> visited) {
+        if (node.remaining == 0) {
+            return node.score;
+        }
         
-    	if (node.remaining == 0) {
-    		return node.score;
-    	}
-    	
-    	if (visited.containsKey(node)) {
-    		return visited.get(node);
-    	}
-
-		node.score = isMax ? Integer.MIN_VALUE : Integer.MAX_VALUE;
-		int action = 1;
-		
-		while (action <= MAX_REMOVAL && action <= node.remaining) {
-			int newRemaining = node.remaining - action;
-			GameTreeNode childNode = new GameTreeNode(newRemaining, action, !node.isMax);
-			if (childNode.remaining == 0) {
-				childNode.score = childNode.isMax ? 0 : 1;
-			}
-			node.children.add(childNode);
-			action++;
-			
-			if (isMax) {
-    			node.score = Math.max(node.score, alphaBetaMinimax(childNode, alpha, beta, false, visited));
-    			alpha = Math.max(alpha, node.score);
-    			node.score = alpha;
-			} else {
-    			node.score = Math.min(node.score, alphaBetaMinimax(childNode, alpha, beta, true, visited));
-    			beta = Math.min(beta, node.score);
-    			node.score = beta;
-			}
-			
-			if (beta <= alpha) {
-				break;
-			}
-    	}
-
-		visited.put(node, node.score);
-		return node.score;
+        if (visited.containsKey(node)) {
+            return visited.get(node);
+        }
+        
+        node.score = isMax ? Integer.MIN_VALUE : Integer.MAX_VALUE;
+        
+        for (int action = 1; action <= Math.min(MAX_REMOVAL, node.remaining); action++) {
+            int newRemaining = node.remaining - action;
+            GameTreeNode childNode = new GameTreeNode(newRemaining, action, !node.isMax);
+            
+            if (childNode.remaining == 0) {
+                childNode.score = childNode.isMax ? 0 : 1;
+            }
+            
+            if (isMax) {
+                node.score = Math.max(node.score, alphaBetaMinimax(childNode, alpha, beta, false, visited));
+                alpha = Math.max(alpha, node.score);
+            } else {
+                node.score = Math.min(node.score, alphaBetaMinimax(childNode, alpha, beta, true, visited));
+                beta = Math.min(beta, node.score);
+            }
+            
+            node.children.add(childNode);
+            visited.put(node, node.score);
+            
+            if (beta <= alpha) {
+                break;
+            }
+        }
+        return node.score;
     }
 }
 
@@ -132,15 +130,4 @@ class GameTreeNode {
     public int hashCode () {
         return remaining + ((isMax) ? 1 : 0);
     }
-    
-    @Override
-    public String toString () {
-    	String output = "~";
-    	
-    	for (GameTreeNode child: children) {
-    		output += child.remaining;
-    	}
-    	return output;
-    }
-    
 }
