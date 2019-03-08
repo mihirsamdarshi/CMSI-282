@@ -1,4 +1,4 @@
-package pathfinder.informed;
+package pathfinder.informed.solution;
 
 import java.util.Map;
 import java.util.Set;

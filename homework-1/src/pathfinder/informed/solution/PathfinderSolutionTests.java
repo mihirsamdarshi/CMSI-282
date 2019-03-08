@@ -1,5 +1,4 @@
-package pathfinder.informed;
-
+package pathfinder.informed.solution;
 
 import static org.junit.Assert.*;
 
