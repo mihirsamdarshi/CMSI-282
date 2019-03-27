@@ -108,7 +108,7 @@ public class LCS {
     public static Set<String> topDownLCS (String rStr, String cStr) {
         memoCheck = topDownTableFill(rStr, rStr.length(), cStr, cStr.length(), 
                 new int[rStr.length() + 1][cStr.length() + 1]);
-        System.out.println(Arrays.deepToString(memoCheck));
+//      System.out.println(Arrays.deepToString(memoCheck));
         return collectSolution("0" + rStr, rStr.length(), "0" + cStr, cStr.length(), memoCheck);
     }
     
