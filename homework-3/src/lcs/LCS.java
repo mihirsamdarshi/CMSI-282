@@ -4,6 +4,11 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * @author <DiBiagio, Will>
+ * @author <Samdarshi, Mihir>
+ */
+
 public class LCS {
     
     /**
@@ -17,8 +22,13 @@ public class LCS {
     // Shared Helper Methods
     // -----------------------------------------------
     
-    // [!] TODO: Add your shared helper methods here!
-    
+    /**
+     * 
+     * @param
+     * @param
+     * @return
+     *
+     */ 
     public static Set<String> collectSolution (String rStr, int r, String cStr, int c, int[][] memo) {
         if (r == 0 || c == 0) {
             return new HashSet<String>(Arrays.asList(""));
@@ -64,7 +74,13 @@ public class LCS {
     }
     
     
-    //documentation 
+    /**
+     * 
+     * @param
+     * @param
+     * @return
+     *
+     */
     public static int[][] bottomUpTableFill (String rStr, String cStr) {
         int table[][] = new int[rStr.length() + 1][cStr.length() + 1];
         for (int r = 1; r <= rStr.length(); r++) {
@@ -90,14 +106,20 @@ public class LCS {
      *         [Side Effect] sets memoCheck to refer to table  
      */
     public static Set<String> topDownLCS (String rStr, String cStr) {
-        memoCheck = topDownTableFill(rStr, rStr.length(), cStr, cStr.length(), new int[rStr.length() + 1][cStr.length() + 1]);
-//      System.out.println(Arrays.deepToString(memoCheck));
+        memoCheck = topDownTableFill(rStr, rStr.length(), cStr, cStr.length(), 
+                new int[rStr.length() + 1][cStr.length() + 1]);
+        System.out.println(Arrays.deepToString(memoCheck));
         return collectSolution("0" + rStr, rStr.length(), "0" + cStr, cStr.length(), memoCheck);
     }
     
-    // [!] TODO: Add any top-down specific helpers here!
+    // [!] TODO: MEMO!
     
-    /** MEMO?
+    /**
+     * 
+     * @param
+     * @param
+     * @return
+     *
      */
     public static int[][] topDownTableFill (String rStr, int r, String cStr, int c, int[][] table) {
         
@@ -113,7 +135,7 @@ public class LCS {
         table = topDownTableFill(rStr, r - 1, cStr, c, table);
         table = topDownTableFill(rStr, r, cStr, c - 1, table);
         
-        table[r][c] = (table[r - 1][c] < table[r][c - 1]) ? table[r][c - 1] : table[r - 1][c];
+        table[r][c] = Math.max(table[r][c - 1], table[r - 1][c]);
         
         return table;   
     }
