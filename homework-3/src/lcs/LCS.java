@@ -20,15 +20,13 @@ public class LCS {
     // [!] TODO: Add your shared helper methods here!
     
     public static Set<String> collectSolution (String rStr, int r, String cStr, int c, int[][] memo) {
-        
-        Set<String> result = new HashSet<String>();
         if (r == 0 || c == 0) {
-            result.add("");
-            return result;
+            return new HashSet<String>(Arrays.asList(""));
         }       
         
+        Set<String> result = new HashSet<String>();
+        
         if (rStr.charAt(r) == cStr.charAt(c)) {
-            
             for (String substring : collectSolution(rStr, r - 1, cStr, c - 1, memo)) {
                 result.add(substring + rStr.charAt(r));
             }
@@ -44,7 +42,6 @@ public class LCS {
         }
 
         return result;
-
     }
 
     // -----------------------------------------------
@@ -61,19 +58,23 @@ public class LCS {
      *         [Side Effect] sets memoCheck to refer to table
      */
     public static Set<String> bottomUpLCS (String rStr, String cStr) {
-        memoCheck = new int[rStr.length() + 1][cStr.length() + 1];
-        for (int r = 1; r <= rStr.length(); r++) {
-            for (int c = 1; c <= cStr.length(); c++) {
-                memoCheck[r][c] = rStr.charAt(r - 1) != cStr.charAt(c - 1) 
-                        ? Math.max(memoCheck[r - 1][c], memoCheck[r][c - 1]) : memoCheck[r - 1][c - 1] + 1;
-            }
-        }   
+        memoCheck = bottomUpTableFill(rStr, cStr);
 //      System.out.println(Arrays.deepToString(memoCheck));
         return collectSolution("0" + rStr, rStr.length(), "0" + cStr, cStr.length(), memoCheck); 
     }
     
-    // [!] TODO: Add any bottom-up specific helpers here!
     
+    //documentation 
+    public static int[][] bottomUpTableFill (String rStr, String cStr) {
+        int table[][] = new int[rStr.length() + 1][cStr.length() + 1];
+        for (int r = 1; r <= rStr.length(); r++) {
+            for (int c = 1; c <= cStr.length(); c++) {
+                table[r][c] = rStr.charAt(r - 1) != cStr.charAt(c - 1) 
+                        ? Math.max(table[r - 1][c], table[r][c - 1]) : table[r - 1][c - 1] + 1;
+            }
+        }
+        return table;
+    }
     
     // -----------------------------------------------
     // Top-Down LCS
@@ -89,30 +90,31 @@ public class LCS {
      *         [Side Effect] sets memoCheck to refer to table  
      */
     public static Set<String> topDownLCS (String rStr, String cStr) {
-        
-        int[][] memo = new int[rStr.length() + 1][cStr.length() + 1];
-        
-        memoCheck = tableFill(rStr, rStr.length(), cStr, cStr.length(), memo);
-        
-        throw new UnsupportedOperationException();
+        memoCheck = topDownTableFill(rStr, rStr.length(), cStr, cStr.length(), new int[rStr.length() + 1][cStr.length() + 1]);
+//      System.out.println(Arrays.deepToString(memoCheck));
+        return collectSolution("0" + rStr, rStr.length(), "0" + cStr, cStr.length(), memoCheck);
     }
     
     // [!] TODO: Add any top-down specific helpers here!
     
-    /**
+    /** MEMO?
      */
-    public static int[][] tableFill (String rStr, int r, String cStr, int c, int[][] memo) {
+    public static int[][] topDownTableFill (String rStr, int r, String cStr, int c, int[][] table) {
         
         if (r == 0 || c == 0) {
             return table;
         }
         
-        if (rStr.charAt(r) == cStr.charAt(c)) {
-            int[][] temp = tableFill(rStr, r - 1, cStr, c - 1, table);
-            
+        if (rStr.charAt(r - 1) == cStr.charAt(c - 1)) {
+            table[r][c] = topDownTableFill(rStr, r - 1, cStr, c - 1, table)[r - 1][c - 1] + 1;
+            return table;   
         }
-
-    } 
-    
-    
+        
+        table = topDownTableFill(rStr, r - 1, cStr, c, table);
+        table = topDownTableFill(rStr, r, cStr, c - 1, table);
+        
+        table[r][c] = (table[r - 1][c] < table[r][c - 1]) ? table[r][c - 1] : table[r - 1][c];
+        
+        return table;   
+    }
 }
