@@ -23,13 +23,16 @@ public class LCS {
     // -----------------------------------------------
     
     /**
-     * 
-     * @param
-     * @param
-     * @return
+     * Helper method to return a Set of solution strings from a DP table and its inputs.
+     * @param rStr The String found along the table's rows
+     * @param r The length of rStr
+     * @param cStr The String found along the table's cols
+     * @param C The length of cStr
+     * @param table The DP table.
+     * @return Set<String> The Set of solution strings from a DP table.
      *
      */ 
-    public static Set<String> collectSolution (String rStr, int r, String cStr, int c, int[][] memo) {
+    private static Set<String> collectSolution (String rStr, int r, String cStr, int c, int[][] table) {
     	if (r == 0 || c == 0) {
     		return new HashSet<String>(Arrays.asList(""));
     	}    	
@@ -37,18 +40,18 @@ public class LCS {
     	Set<String> result = new HashSet<String>();
     	
     	if (rStr.charAt(r) == cStr.charAt(c)) {
-    		for (String substring : collectSolution(rStr, r - 1, cStr, c - 1, memo)) {
+    		for (String substring : collectSolution(rStr, r - 1, cStr, c - 1, table)) {
     			result.add(substring + rStr.charAt(r));
     		}
     		return result;
     	}
     	
-    	if (memo[r][c - 1] >= memo[r - 1][c]) {	
-    		result.addAll(collectSolution(rStr, r, cStr, c - 1, memo));
+    	if (table[r][c - 1] >= table[r - 1][c]) {	
+    		result.addAll(collectSolution(rStr, r, cStr, c - 1, table));
     	}
     	
-    	if (memo[r - 1][c] >= memo[r][c - 1]) {
-    		result.addAll(collectSolution(rStr, r - 1, cStr, c, memo));
+    	if (table[r - 1][c] >= table[r][c - 1]) {
+    		result.addAll(collectSolution(rStr, r - 1, cStr, c, table));
     	}
 
     	return result;
@@ -73,13 +76,13 @@ public class LCS {
     } 
     
     /**
-     * 
-     * @param
-     * @param
-     * @return
+     * Helper function for bottomUpLCS. Provides a solution DP table given two input strings.
+     * @param rStr 
+     * @param cStr
+     * @return int[][] Solution DP table.
      *
      */
-    public static int[][] bottomUpTableFill (String rStr, String cStr) {
+    private static int[][] bottomUpTableFill (String rStr, String cStr) {
     	int table[][] = new int[rStr.length() + 1][cStr.length() + 1];
     	for (int r = 1; r <= rStr.length(); r++) {
     		for (int c = 1; c <= cStr.length(); c++) {
@@ -110,13 +113,16 @@ public class LCS {
     }
     
     /**
-     * 
-     * @param
-     * @param
-     * @return
+     * Helper function for topDownLCS. Provides a solution DP table.
+     * @param rStr 
+     * @param r
+     * @param cStr
+     * @param c
+     * @param table
+     * @return int[][]
      *
      */
-    public static int[][] topDownTableFill (String rStr, int r, String cStr, int c, int[][] table) {
+    private static int[][] topDownTableFill (String rStr, int r, String cStr, int c, int[][] table) {
     	
     	if (r == 0 || c == 0) {
     		return table;
