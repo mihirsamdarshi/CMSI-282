@@ -30,7 +30,6 @@ public class LCS {
      * @param C The length of cStr
      * @param table The DP table.
      * @return Set<String> The Set of solution strings from a DP table.
-     *
      */ 
     private static Set<String> collectSolution (String rStr, int r, String cStr, int c, int[][] table) {
     	if (r == 0 || c == 0) {
@@ -76,11 +75,10 @@ public class LCS {
     } 
     
     /**
-     * Helper function for bottomUpLCS. Provides a solution DP table given two input strings.
-     * @param rStr 
-     * @param cStr
-     * @return int[][] Solution DP table.
-     *
+     * Helper method for bottomUpLCS. Provides a solution DP table using bottom up DP approach.
+     * @param rStr The String found along the table's rows
+     * @param cStr The String found along the table's cols
+     * @return int[][] DP solution table.
      */
     private static int[][] bottomUpTableFill (String rStr, String cStr) {
     	int table[][] = new int[rStr.length() + 1][cStr.length() + 1];
