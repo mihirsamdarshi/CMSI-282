@@ -39,9 +39,9 @@ public class LCS {
     	
     	Set<String> result = new HashSet<String>();
     	
-    	if (rStr.charAt(r) == cStr.charAt(c)) {
+    	if (rStr.charAt(r - 1) == cStr.charAt(c - 1)) {
     		for (String substring : collectSolution(rStr, r - 1, cStr, c - 1, table)) {
-    			result.add(substring + rStr.charAt(r));
+    			result.add(substring + rStr.charAt(r - 1));
     		}
     		return result;
     	}
@@ -72,7 +72,7 @@ public class LCS {
      */
     public static Set<String> bottomUpLCS (String rStr, String cStr) {
     	memoCheck = bottomUpTableFill(rStr, cStr);
-        return collectSolution("0" + rStr, rStr.length(), "0" + cStr, cStr.length(), memoCheck); 
+        return collectSolution(rStr, rStr.length(), cStr, cStr.length(), memoCheck); 
     } 
     
     /**
@@ -109,7 +109,7 @@ public class LCS {
     public static Set<String> topDownLCS (String rStr, String cStr) {
     	memoCheck = topDownTableFill(rStr, rStr.length(), cStr, cStr.length(), 
     			new int[rStr.length() + 1][cStr.length() + 1]);
-    	return collectSolution("0" + rStr, rStr.length(), "0" + cStr, cStr.length(), memoCheck);
+    	return collectSolution(rStr, rStr.length(), cStr, cStr.length(), memoCheck);
     }
     
     /**
