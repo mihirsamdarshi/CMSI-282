@@ -184,4 +184,64 @@ public class LCSTests {
         );
     }
     
+    @Test
+    public void TDLCSTest_5() {
+        assertEquals(
+            new HashSet<>(Arrays.asList(
+                "AAAAA"
+            )),
+            LCS.topDownLCS("AAAAA", "AAAAA")
+        );
+        assertArrayEquals(
+            new int[][] {
+                {0, 0, 0, 0, 0, 0},
+                {0, 1, 0, 0, 0, 0},
+                {0, 0, 2, 0, 0, 0},
+                {0, 0, 0, 3, 0, 0},
+                {0, 0, 0, 0, 4, 0},
+                {0, 0, 0, 0, 0, 5}
+            },
+            LCS.memoCheck
+        );
+    }
+    
+    @Test
+    public void TDLCSTest_6() {
+        assertEquals(
+            new HashSet<>(Arrays.asList(
+                "AY", "AX"
+            )),
+            LCS.topDownLCS("AXYT", "AYZX")
+        );
+        assertArrayEquals(
+            new int[][] {
+            	{0, 0, 0, 0, 0},
+            	{0, 1, 1, 1, 0},
+            	{0, 1, 1, 1, 2},
+            	{0, 1, 2, 2, 2},
+            	{0, 1, 2, 2, 2}
+            },
+            LCS.memoCheck
+        );
+    }
+    
+    @Test
+    public void TDLCSTest_7() {
+        assertEquals(
+            new HashSet<>(Arrays.asList(
+                "AB", "AX"
+            )),
+            LCS.topDownLCS("AXB", "ABX")
+        );
+        assertArrayEquals(
+            new int[][] {
+                {0, 0, 0, 0},
+                {0, 1, 1, 0},
+                {0, 1, 0, 2},
+                {0, 0, 2, 2}
+            },
+            LCS.memoCheck
+        );
+    }
+    
 }
