@@ -1,6 +1,13 @@
 package lcs;
 
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Set;
+
+/**
+ * @author <DiBiagio, Will>
+ * @author <Samdarshi, Mihir>
+ */
 
 public class LCS {
     
@@ -15,8 +22,39 @@ public class LCS {
     // Shared Helper Methods
     // -----------------------------------------------
     
-    // [!] TODO: Add your shared helper methods here!
-    
+    /**
+     * Helper method to return a Set of solution strings from a DP table and its inputs.
+     * @param rStr The String found along the table's rows
+     * @param r The length of rStr
+     * @param cStr The String found along the table's cols
+     * @param C The length of cStr
+     * @param table The DP table.
+     * @return Set<String> The Set of solution strings from a DP table.
+     */ 
+    private static Set<String> collectSolution (String rStr, int r, String cStr, int c, int[][] table) {
+    	if (r == 0 || c == 0) {
+    		return new HashSet<String>(Arrays.asList(""));
+    	}    	
+    	
+    	Set<String> result = new HashSet<String>();
+    	
+    	if (rStr.charAt(r - 1) == cStr.charAt(c - 1)) {
+    		for (String substring : collectSolution(rStr, r - 1, cStr, c - 1, table)) {
+    			result.add(substring + rStr.charAt(r - 1));
+    		}
+    		return result;
+    	}
+    	
+    	if (table[r][c - 1] >= table[r - 1][c]) {	
+    		result.addAll(collectSolution(rStr, r, cStr, c - 1, table));
+    	}
+    	
+    	if (table[r - 1][c] >= table[r][c - 1]) {
+    		result.addAll(collectSolution(rStr, r - 1, cStr, c, table));
+    	}
+
+    	return result;
+    }
 
     // -----------------------------------------------
     // Bottom-Up LCS
@@ -32,11 +70,26 @@ public class LCS {
      *         [Side Effect] sets memoCheck to refer to table
      */
     public static Set<String> bottomUpLCS (String rStr, String cStr) {
-        throw new UnsupportedOperationException();
+    	memoCheck = bottomUpTableFill(rStr, cStr);
+        return collectSolution(rStr, rStr.length(), cStr, cStr.length(), memoCheck); 
+    } 
+    
+    /**
+     * Helper method for bottomUpLCS. Provides a solution DP table using bottom up DP approach.
+     * @param rStr The String found along the table's rows
+     * @param cStr The String found along the table's cols
+     * @return int[][] DP solution table.
+     */
+    private static int[][] bottomUpTableFill (String rStr, String cStr) {
+    	int table[][] = new int[rStr.length() + 1][cStr.length() + 1];
+    	for (int r = 1; r <= rStr.length(); r++) {
+    		for (int c = 1; c <= cStr.length(); c++) {
+    			table[r][c] = rStr.charAt(r - 1) != cStr.charAt(c - 1) 
+    					? Math.max(table[r - 1][c], table[r][c - 1]) : table[r - 1][c - 1] + 1;
+    		}
+    	}
+    	return table;
     }
-    
-    // [!] TODO: Add any bottom-up specific helpers here!
-    
     
     // -----------------------------------------------
     // Top-Down LCS
@@ -52,10 +105,41 @@ public class LCS {
      *         [Side Effect] sets memoCheck to refer to table  
      */
     public static Set<String> topDownLCS (String rStr, String cStr) {
-        throw new UnsupportedOperationException();
+    	memoCheck = topDownTableFill(rStr, rStr.length(), cStr, cStr.length(), 
+    			new int[rStr.length() + 1][cStr.length() + 1]);
+    	return collectSolution(rStr, rStr.length(), cStr, cStr.length(), memoCheck);
     }
     
-    // [!] TODO: Add any top-down specific helpers here!
-    
-    
+    /**
+     * Helper method for topDownLCS. Provides a solution DP table using top down DP approach. 
+     * @param rStr The String found along the table's rows
+     * @param r The length of rStr
+     * @param cStr The String found along the table's cols
+     * @param C The length of cStr
+     * @param table The DP table.
+     * @return int[][] DP solution table.
+     *
+     */
+    private static int[][] topDownTableFill (String rStr, int r, String cStr, int c, int[][] table) {
+    	
+    	if (r == 0 || c == 0) {
+    		return table;
+    	}
+    	
+    	if (table[r][c] != 0) {
+    		return table;
+    	}
+    	
+    	if (rStr.charAt(r - 1) == cStr.charAt(c - 1)) {
+    		table[r][c] = topDownTableFill(rStr, r - 1, cStr, c - 1, table)[r - 1][c - 1] + 1;
+    		return table;	
+    	}
+    	
+    	table = topDownTableFill(rStr, r - 1, cStr, c, table);
+    	table = topDownTableFill(rStr, r, cStr, c - 1, table);
+		
+    	table[r][c] = Math.max(table[r][c - 1], table[r - 1][c]);
+		
+		return table; 	
+    }
 }
