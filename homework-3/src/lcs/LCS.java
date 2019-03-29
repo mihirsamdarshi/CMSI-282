@@ -30,28 +30,28 @@ public class LCS {
      *
      */ 
     public static Set<String> collectSolution (String rStr, int r, String cStr, int c, int[][] memo) {
-        if (r == 0 || c == 0) {
-            return new HashSet<String>(Arrays.asList(""));
-        }       
-        
-        Set<String> result = new HashSet<String>();
-        
-        if (rStr.charAt(r) == cStr.charAt(c)) {
-            for (String substring : collectSolution(rStr, r - 1, cStr, c - 1, memo)) {
-                result.add(substring + rStr.charAt(r));
-            }
-            return result;
-        }
-        
-        if (memo[r][c - 1] >= memo[r - 1][c]) { 
-            result.addAll(collectSolution(rStr, r, cStr, c - 1, memo));
-        }
-        
-        if (memo[r - 1][c] >= memo[r][c - 1]) {
-            result.addAll(collectSolution(rStr, r - 1, cStr, c, memo));
-        }
+    	if (r == 0 || c == 0) {
+    		return new HashSet<String>(Arrays.asList(""));
+    	}    	
+    	
+    	Set<String> result = new HashSet<String>();
+    	
+    	if (rStr.charAt(r) == cStr.charAt(c)) {
+    		for (String substring : collectSolution(rStr, r - 1, cStr, c - 1, memo)) {
+    			result.add(substring + rStr.charAt(r));
+    		}
+    		return result;
+    	}
+    	
+    	if (memo[r][c - 1] >= memo[r - 1][c]) {	
+    		result.addAll(collectSolution(rStr, r, cStr, c - 1, memo));
+    	}
+    	
+    	if (memo[r - 1][c] >= memo[r][c - 1]) {
+    		result.addAll(collectSolution(rStr, r - 1, cStr, c, memo));
+    	}
 
-        return result;
+    	return result;
     }
 
     // -----------------------------------------------
@@ -68,11 +68,9 @@ public class LCS {
      *         [Side Effect] sets memoCheck to refer to table
      */
     public static Set<String> bottomUpLCS (String rStr, String cStr) {
-        memoCheck = bottomUpTableFill(rStr, cStr);
-//      System.out.println(Arrays.deepToString(memoCheck));
+    	memoCheck = bottomUpTableFill(rStr, cStr);
         return collectSolution("0" + rStr, rStr.length(), "0" + cStr, cStr.length(), memoCheck); 
-    }
-    
+    } 
     
     /**
      * 
@@ -82,14 +80,14 @@ public class LCS {
      *
      */
     public static int[][] bottomUpTableFill (String rStr, String cStr) {
-        int table[][] = new int[rStr.length() + 1][cStr.length() + 1];
-        for (int r = 1; r <= rStr.length(); r++) {
-            for (int c = 1; c <= cStr.length(); c++) {
-                table[r][c] = rStr.charAt(r - 1) != cStr.charAt(c - 1) 
-                        ? Math.max(table[r - 1][c], table[r][c - 1]) : table[r - 1][c - 1] + 1;
-            }
-        }
-        return table;
+    	int table[][] = new int[rStr.length() + 1][cStr.length() + 1];
+    	for (int r = 1; r <= rStr.length(); r++) {
+    		for (int c = 1; c <= cStr.length(); c++) {
+    			table[r][c] = rStr.charAt(r - 1) != cStr.charAt(c - 1) 
+    					? Math.max(table[r - 1][c], table[r][c - 1]) : table[r - 1][c - 1] + 1;
+    		}
+    	}
+    	return table;
     }
     
     // -----------------------------------------------
@@ -106,13 +104,10 @@ public class LCS {
      *         [Side Effect] sets memoCheck to refer to table  
      */
     public static Set<String> topDownLCS (String rStr, String cStr) {
-        memoCheck = topDownTableFill(rStr, rStr.length(), cStr, cStr.length(), 
-                new int[rStr.length() + 1][cStr.length() + 1]);
-//      System.out.println(Arrays.deepToString(memoCheck));
-        return collectSolution("0" + rStr, rStr.length(), "0" + cStr, cStr.length(), memoCheck);
+    	memoCheck = topDownTableFill(rStr, rStr.length(), cStr, cStr.length(), 
+    			new int[rStr.length() + 1][cStr.length() + 1]);
+    	return collectSolution("0" + rStr, rStr.length(), "0" + cStr, cStr.length(), memoCheck);
     }
-    
-    // [!] TODO: MEMO!
     
     /**
      * 
@@ -122,21 +117,25 @@ public class LCS {
      *
      */
     public static int[][] topDownTableFill (String rStr, int r, String cStr, int c, int[][] table) {
-        
-        if (r == 0 || c == 0) {
-            return table;
-        }
-        
-        if (rStr.charAt(r - 1) == cStr.charAt(c - 1)) {
-            table[r][c] = topDownTableFill(rStr, r - 1, cStr, c - 1, table)[r - 1][c - 1] + 1;
-            return table;   
-        }
-        
-        table = topDownTableFill(rStr, r - 1, cStr, c, table);
-        table = topDownTableFill(rStr, r, cStr, c - 1, table);
-        
-        table[r][c] = Math.max(table[r][c - 1], table[r - 1][c]);
-        
-        return table;   
+    	
+    	if (r == 0 || c == 0) {
+    		return table;
+    	}
+    	
+    	if (table[r][c] != 0) {
+    		return table;
+    	}
+    	
+    	if (rStr.charAt(r - 1) == cStr.charAt(c - 1)) {
+    		table[r][c] = topDownTableFill(rStr, r - 1, cStr, c - 1, table)[r - 1][c - 1] + 1;
+    		return table;	
+    	}
+    	
+    	table = topDownTableFill(rStr, r - 1, cStr, c, table);
+    	table = topDownTableFill(rStr, r, cStr, c - 1, table);
+		
+    	table[r][c] = Math.max(table[r][c - 1], table[r - 1][c]);
+		
+		return table; 	
     }
 }
