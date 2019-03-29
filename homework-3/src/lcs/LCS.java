@@ -113,13 +113,13 @@ public class LCS {
     }
     
     /**
-     * Helper function for topDownLCS. Provides a solution DP table.
-     * @param rStr 
-     * @param r
-     * @param cStr
-     * @param c
-     * @param table
-     * @return int[][]
+     * Helper method for topDownLCS. Provides a solution DP table using top down DP approach. 
+     * @param rStr The String found along the table's rows
+     * @param r The length of rStr
+     * @param cStr The String found along the table's cols
+     * @param C The length of cStr
+     * @param table The DP table.
+     * @return int[][] DP solution table.
      *
      */
     private static int[][] topDownTableFill (String rStr, int r, String cStr, int c, int[][] table) {
