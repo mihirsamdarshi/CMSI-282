@@ -3,6 +3,7 @@ bin/
 .classpath
 .project
 .settings
+.recommenders
 
 # Compiled source #
 ###################
