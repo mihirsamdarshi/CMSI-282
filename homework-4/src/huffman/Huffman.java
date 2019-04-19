@@ -17,6 +17,7 @@ public class Huffman {
 
     private HuffNode trieRoot;
     private Map<Character, String> encodingMap;
+    // The encoding map maps each character to a string representation of its bitstring, e.g., `{'C': "0", 'A': "10", 'T': "11"}`
     
     /**
      * Creates the Huffman Trie and Encoding Map using the character
@@ -49,28 +50,28 @@ public class Huffman {
      */
     public byte[] compress (String message) {
         char[] corpusArray = message.toCharArray();
-        Map<Character, Integer> characterMap = new HashMap<>();
+        Map<Character, Integer> frequencyMap = new HashMap<>();
 
         for (int i = 0; i < corpusArray.length; i++) {
-            if (characterMap.containsKey(corpusArray[i])) {
-                characterMap.put(corpusArray[i], characterMap.get(corpusArray[i]) + 1);
+            if (frequencyMap.containsKey(corpusArray[i])) {
+                frequencyMap.put(corpusArray[i], frequencyMap.get(corpusArray[i]) + 1);
             } else {
-                characterMap.put(corpusArray[i], 1);
+                frequencyMap.put(corpusArray[i], 1);
             }
         }
         
 //      for each character to encode:
 //      create leaf node and add to priority queue
         PriorityQueue<HuffNode> queue = new PriorityQueue();
-        for (Map.Entry<Character, Integer> entry : characterMap.entrySet()) {
+        for (Map.Entry<Character, Integer> entry : frequencyMap.entrySet()) {
             queue.add(new HuffNode(entry.getKey(), entry.getValue()));
         }
         
 //      while more than 1 node in queue:
-//      remove 2 smallest probability nodes from queue
-//      create new parent node of these 2 removed with sum of their probabilities
-//      enqueue new parent
-//  remaining node is the root
+//          remove 2 smallest probability nodes from queue
+//          create new parent node of these 2 removed with sum of their probabilities
+//          enqueue new parent
+//          remaining node is the root
         while (queue.size() > 1) {
             HuffNode left = queue.poll();
             HuffNode right = queue.poll();
@@ -78,6 +79,8 @@ public class Huffman {
             HuffNode parent = new HuffNode(left, right, left.count + right.count);
             queue.add(parent);
         }
+        
+        trieRoot = queue.poll();
         
         throw new UnsupportedOperationException();
     }
@@ -99,6 +102,13 @@ public class Huffman {
      * @return Decompressed String representation of the compressed bytecode message.
      */
     public String decompress (byte[] compressedMsg) {
+        
+//        Start at the root of the trie and the first bit in the bitstring
+//        follow the left reference whenever a 0 is encountered in the bitstring
+//        follow the right reference when a 1 is encountered.
+//        Add the letter corresponding to a leaf node to the output whenever the above traversal hits a leaf.
+//        Begin again at the root for the next letter to decompress.
+        
         throw new UnsupportedOperationException();
     }
     
