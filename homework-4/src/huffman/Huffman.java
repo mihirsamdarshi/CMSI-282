@@ -2,6 +2,7 @@ package huffman;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.PriorityQueue;
 
 /**
  * Huffman instances provide reusable Huffman Encoding Maps for
@@ -27,18 +28,7 @@ public class Huffman {
      *        differ.
      */
     Huffman (String corpus) {
-        char[] corpusArray = corpus.toCharArray();
-        Map<Character, Integer> charMap = new HashMap<>();
-
-        for (int i = 0; i < corpusArray.length; i++) {
-
-            if (charMap.containsKey(corpusArray[i])) {
-                charMap.put(corpusArray[i], charMap.get(corpusArray[i]) + 1);
-            }
-            else {
-                charMap.put(corpusArray[i], 1);
-            }
-        }
+        compress(corpus);
     }
     
     
@@ -58,6 +48,37 @@ public class Huffman {
      *         0-padding on the final byte.
      */
     public byte[] compress (String message) {
+        char[] corpusArray = message.toCharArray();
+        Map<Character, Integer> characterMap = new HashMap<>();
+
+        for (int i = 0; i < corpusArray.length; i++) {
+            if (characterMap.containsKey(corpusArray[i])) {
+                characterMap.put(corpusArray[i], characterMap.get(corpusArray[i]) + 1);
+            } else {
+                characterMap.put(corpusArray[i], 1);
+            }
+        }
+        
+//      for each character to encode:
+//      create leaf node and add to priority queue
+        PriorityQueue<HuffNode> queue = new PriorityQueue();
+        for (Map.Entry<Character, Integer> entry : characterMap.entrySet()) {
+            queue.add(new HuffNode(entry.getKey(), entry.getValue()));
+        }
+        
+//      while more than 1 node in queue:
+//      remove 2 smallest probability nodes from queue
+//      create new parent node of these 2 removed with sum of their probabilities
+//      enqueue new parent
+//  remaining node is the root
+        while (queue.size() > 1) {
+            HuffNode left = queue.poll();
+            HuffNode right = queue.poll();
+            
+            HuffNode parent = new HuffNode(left, right, left.count + right.count);
+            queue.add(parent);
+        }
+        
         throw new UnsupportedOperationException();
     }
     
@@ -102,6 +123,12 @@ public class Huffman {
         HuffNode (char character, int count) {
             this.count = count;
             this.character = character;
+        }
+        
+        public HuffNode(HuffNode left, HuffNode right, int count) {
+            this.left = left;
+            this.right = right;
+            this.count = count;
         }
         
         public boolean isLeaf () {
