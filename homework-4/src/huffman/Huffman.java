@@ -1,5 +1,6 @@
 package huffman;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -26,7 +27,18 @@ public class Huffman {
      *        differ.
      */
     Huffman (String corpus) {
-        // TODO!
+        char[] corpusArray = corpus.toCharArray();
+        Map<Character, Integer> charMap = new HashMap<>();
+
+        for (int i = 0; i < corpusArray.length; i++) {
+
+            if (charMap.containsKey(corpusArray[i])) {
+                charMap.put(corpusArray[i], charMap.get(corpusArray[i]) + 1);
+            }
+            else {
+                charMap.put(corpusArray[i], 1);
+            }
+        }
     }
     
     
