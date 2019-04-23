@@ -76,11 +76,17 @@ public class Huffman {
             HuffNode left = queue.poll();
             HuffNode right = queue.poll();
             
-            HuffNode parent = new HuffNode(left, right, left.count + right.count);
+            Character ch = null;
+            
+            HuffNode parent = new HuffNode(ch, left.count + right.count);
+            
+            parent.left = left;
+            parent.right = right;
+            
             queue.add(parent);
         }
         
-        trieRoot = queue.poll();
+        trieRoot = queue.peek();
         
         throw new UnsupportedOperationException();
     }
@@ -133,12 +139,6 @@ public class Huffman {
         HuffNode (char character, int count) {
             this.count = count;
             this.character = character;
-        }
-        
-        public HuffNode(HuffNode left, HuffNode right, int count) {
-            this.left = left;
-            this.right = right;
-            this.count = count;
         }
         
         public boolean isLeaf () {
