@@ -135,7 +135,23 @@ public class Huffman {
 //        Add the letter corresponding to a leaf node to the output whenever the above traversal hits a leaf.
 //        Begin again at the root for the next letter to decompress.
 
-        throw new UnsupportedOperationException();
+        StringBuilder message = new StringBuilder();
+        HuffNode curr = trieRoot;
+        int i = 0;
+        while (i < compressedMsg.length) {
+            while (curr.left != null && curr.right != null) {
+                if (compressedMsg[i] == 1) {
+                    curr = curr.right;
+                } else if (compressedMsg[i] == 0) {
+                    curr = curr.left;
+                }
+                i++;
+            }
+            message.append(curr.character);
+            curr = trieRoot;
+        }
+        String result = message.toString();
+        return result;
     }
 
 
