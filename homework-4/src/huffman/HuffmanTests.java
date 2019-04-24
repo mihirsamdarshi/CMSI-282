@@ -4,9 +4,23 @@ import static org.junit.Assert.*;
 import org.junit.Test;
 
 public class HuffmanTests {
-    
+	
+
     // Compression Tests
     // -----------------------------------------------
+	@Test
+	public void comp_t00() {
+		Huffman h = new Huffman("AAAABBCCDDDEFFF");
+		// byte 0: 0000 1111 = 15 (message length = 15)
+		// byte 1: 1111 1101 = -3
+		// byte 2: 1111 1011 = -5
+		// byte 3: 1000 0001 = -127
+		// byte 4: 0001 0110 = 22
+		// byte 5:1010 1000 = -88
+		byte[] compressed = {15, -3, -5, -127, 22, -88};
+		assertArrayEquals(compressed, h.compress("BCBCEFFDFDDAAAA"));
+	}
+		   
     @Test
     public void comp_t0() {
         Huffman h = new Huffman("AB");
