@@ -8,8 +8,8 @@ public class HuffmanTests {
 
     // Compression Tests
     // -----------------------------------------------
-	@Test
-	public void comp_t00() {
+    @Test
+    public void comp_t00() {
 		Huffman h = new Huffman("AAAABBCCDDDEFFF");
 		// byte 0: 0000 1111 = 15 (message length = 15)
 		// byte 1: 1111 1101 = -3
@@ -19,7 +19,7 @@ public class HuffmanTests {
 		// byte 5:1010 1000 = -88
 		byte[] compressed = {15, -3, -5, -127, 22, -88};
 		assertArrayEquals(compressed, h.compress("BCBCEFFDFDDAAAA"));
-	}
+    }	
 		   
     @Test
     public void comp_t0() {
@@ -30,6 +30,8 @@ public class HuffmanTests {
         byte[] compressed = {2, 64};
         assertArrayEquals(compressed, h.compress("AB"));
     }
+    
+
     
     @Test
     public void comp_t1() {
