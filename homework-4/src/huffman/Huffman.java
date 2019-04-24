@@ -72,11 +72,9 @@ public class Huffman {
     
     private void createEncodingMap(String bitString, HuffNode node, Map<Character, String> encodingMap) {
 
-        if (node.left != null && node.right != null) {
-
+        if (node.isLeaf()) {
             createEncodingMap(bitString + "0", node.left, encodingMap);
             createEncodingMap(bitString + "1", node.right, encodingMap);
-
         } else {
             encodingMap.put(node.character, bitString);
         }
@@ -139,7 +137,7 @@ public class Huffman {
         HuffNode curr = trieRoot;
         int i = 0;
         while (i < compressedMsg.length) {
-            while (curr.left != null && curr.right != null) {
+            while (curr.isLeaf()) {
                 if (compressedMsg[i] == 1) {
                     curr = curr.right;
                 } else if (compressedMsg[i] == 0) {
