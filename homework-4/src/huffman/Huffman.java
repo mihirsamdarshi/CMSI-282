@@ -32,18 +32,18 @@ public class Huffman {
      *        differ.
      */
     Huffman (String corpus) {
-    	HashMap<Character, Integer> hmap = new HashMap<Character, Integer>();
+    	HashMap<Character, Integer> freqMap = new HashMap<Character, Integer>();
     	for (char letter: corpus.toCharArray()) {
-    		if(hmap.containsKey(letter)) {
-    			hmap.put(letter, hmap.get(letter) + 1);
+    		if(freqMap.containsKey(letter)) {
+    			freqMap.put(letter, freqMap.get(letter) + 1);
     		} else {
-    			hmap.put(letter, 1);
+    			freqMap.put(letter, 1);
     		}
     	}
     	
     	PriorityQueue<HuffNode> pqueue = new PriorityQueue<>();
-    	for (Character key: hmap.keySet()) {
-    	    HuffNode node = new HuffNode(key, hmap.get(key));    
+    	for (Character key: freqMap.keySet()) {
+    	    HuffNode node = new HuffNode(key, freqMap.get(key));    
     	    pqueue.add(node);
     	}
     	
