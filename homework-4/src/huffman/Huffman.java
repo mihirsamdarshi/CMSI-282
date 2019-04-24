@@ -105,9 +105,8 @@ public class Huffman {
         	output.write((byte) Integer.parseInt(substring, 2));
         	binaryString = binaryString.substring(8);
     	}
-    	
-       	output.write((byte) Integer.parseInt(binaryString, 2) << (8 - binaryString.length()));
 
+       	output.write((byte) Integer.parseInt(binaryString, 2) << (8 - binaryString.length()));       	
     	return output.toByteArray();
     }
 
@@ -128,31 +127,27 @@ public class Huffman {
      * @return Decompressed String representation of the compressed bytecode message.
      */
     public String decompress (byte[] compressedMsg) {
-    	String output = "";
-    	
-    	Map<String, Character> revMap = new HashMap<>();
-    	for(Map.Entry<Character, String> entry : encodingMap.entrySet()){
-    		revMap.put(entry.getValue(), entry.getKey());
-    	}
-    	
     	String bitString = "";
     	for (byte b : compressedMsg){
     		bitString += String.format("%8s", Integer.toBinaryString(b & 0xFF)).replace(' ', '0');
     	}
     	bitString = bitString.substring(8);
     	
-	    String bitStringKey = ""; 
-	    for (char letter : bitString.toCharArray()) {
-	    	bitStringKey += letter;
-	    	if (output.length() == compressedMsg[0]) {
-	    		return output;
-	    	} else if (revMap.containsKey(bitStringKey)) {
-	    		output += revMap.get(bitStringKey);
-	    		bitStringKey = "";
+	    StringBuilder output = new StringBuilder();
+	    
+	    HuffNode currNode = trieRoot;
+	    for (Character bit : bitString.toCharArray()) {
+	    	if (output.length() >= compressedMsg[0]) {
+	    		return output.toString().toString();
 	    	}
-	    }
-
-    	return output;
+	    	if (currNode.isLeaf()) {
+	    		output.append(currNode.character);
+	    		currNode = trieRoot;
+	    	}
+	    	
+	    	currNode = (bit == '0') ? currNode.left : currNode.right;
+	    } 
+    	return output.toString();
     }
     
     
