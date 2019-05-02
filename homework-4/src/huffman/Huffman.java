@@ -9,6 +9,9 @@ import java.util.PriorityQueue;
  * Huffman instances provide reusable Huffman Encoding Maps for
  * compressing and decompressing text corpi with comparable
  * distributions of characters.
+ * 
+ * @author <DiBiagio, Will>
+ * @author <Samdarshi, Mihir>
  */
 public class Huffman {
 
@@ -30,44 +33,48 @@ public class Huffman {
      *        differ.
      */
     Huffman (String corpus) {
-        char[] corpusArray = corpus.toCharArray();
-        Map<Character, Integer> frequencyMap = new HashMap<>();
+    	HashMap<Character, Integer> freqMap = new HashMap<Character, Integer>();
+    	for (char letter: corpus.toCharArray()) {
+    		if(freqMap.containsKey(letter)) {
+    			freqMap.put(letter, freqMap.get(letter) + 1);
+    		} else {
+    			freqMap.put(letter, 1);
+    		}
+    	}
+    	
+    	PriorityQueue<HuffNode> pqueue = new PriorityQueue<>();
+    	for (Character key: freqMap.keySet()) {
+    	    HuffNode node = new HuffNode(key, freqMap.get(key));    
+    	    pqueue.add(node);
+    	}
+    	
+    	while(pqueue.size() > 1) {
+    		HuffNode leftNode = pqueue.poll();
+    		HuffNode rightNode = pqueue.poll();
+    		HuffNode parent = new HuffNode('\0', leftNode.count + rightNode.count);
+    		parent.left = leftNode;
+    		parent.right = rightNode;
+    		pqueue.add(parent);
+    	}
+    	
+    	trieRoot = pqueue.poll();
+    	encodingMap = new HashMap<Character, String>();
+    	fillEncodingMap(trieRoot, "");
+    }
 
-        for (int i = 0; i < corpusArray.length; i++) {
-            if (frequencyMap.containsKey(corpusArray[i])) {
-                frequencyMap.put(corpusArray[i], frequencyMap.get(corpusArray[i]) + 1);
-            } else {
-                frequencyMap.put(corpusArray[i], 1);
-            }
+    /** Recursive void method to fill the encodingMap based off a root node.
+     * @param HuffNode the root node of the Huffman Trie.
+     * @param String the 'binary' path to each node. Start with empty string.
+     */
+    void fillEncodingMap(HuffNode node, String path) {
+        if (node.isLeaf()) {
+            encodingMap.put(node.character, path);
+            return;
         }
+        
+        fillEncodingMap(node.left, path + "0");
+        fillEncodingMap(node.right, path + "1");      
 
-//      for each character to encode:
-//      create leaf node and add to priority queue
-        PriorityQueue<HuffNode> queue = new PriorityQueue();
-        for (Map.Entry<Character, Integer> entry : frequencyMap.entrySet()) {
-            queue.add(new HuffNode(entry.getKey(), entry.getValue()));
-        }
-
-//      while more than 1 node in queue:
-//          remove 2 smallest probability nodes from queue
-//          create new parent node of these 2 removed with sum of their probabilities
-//          enqueue new parent
-//          remaining node is the root
-        while (queue.size() > 1) {
-            HuffNode left = queue.poll();
-            HuffNode right = queue.poll();
-
-            HuffNode parent = new HuffNode('0', left.count + right.count);
-
-            parent.left = left;
-            parent.right = right;
-
-            queue.add(parent);
-        }
-
-        trieRoot = queue.peek();
-
-        createEncodingMap("", trieRoot, encodingMap);
     }
     
     private void createEncodingMap(String bitString, HuffNode node, Map<Character, String> encodingMap) {
@@ -97,17 +104,22 @@ public class Huffman {
      *         0-padding on the final byte.
      */
     public byte[] compress (String message) {
-        
-        byte[] result;
-        
-        for (char character : message.toCharArray()) {
-            ByteArrayOutputStream output = new ByteArrayOutputStream();
-            String byteOfChar = encodingMap.get(character);
-            
-            output.write();
-        }
+    	String binaryString = "";
+    	
+    	for (char letter: message.toCharArray()) {
+    		binaryString += encodingMap.get(letter);
+    	}
 
-        throw new UnsupportedOperationException();
+    	ByteArrayOutputStream output = new ByteArrayOutputStream();
+    	output.write(message.length());
+    	while (binaryString.length() >= 8) {
+        	String substring = binaryString.substring(0, 8);
+        	output.write((byte) Integer.parseInt(substring, 2));
+        	binaryString = binaryString.substring(8);
+    	}
+
+       	output.write((byte) Integer.parseInt(binaryString, 2) << (8 - binaryString.length()));       	
+    	return output.toByteArray();
     }
     
     // -----------------------------------------------
@@ -126,30 +138,28 @@ public class Huffman {
      * @return Decompressed String representation of the compressed bytecode message.
      */
     public String decompress (byte[] compressedMsg) {
+    	String bitString = "";
+    	for (byte b : compressedMsg){
+    		bitString += String.format("%8s", Integer.toBinaryString(b & 0xFF)).replace(' ', '0');
+    	}
+    	bitString = bitString.substring(8);
+    	
+	    StringBuilder output = new StringBuilder();
+	    
+	    HuffNode currNode = trieRoot;
+	    for (Character bit : bitString.toCharArray()) {
+	    	if (output.length() >= compressedMsg[0]) {
+	    		return output.toString().toString();
+	    	}
+	    	if (currNode.isLeaf()) {
+	    		output.append(currNode.character);
+	    		currNode = trieRoot;
+	    	}
+	    	
+	    	currNode = (bit == '0') ? currNode.left : currNode.right;
+	    } 
+    	return output.toString();
 
-//        Start at the root of the trie and the first bit in the bitstring
-//        follow the left reference whenever a 0 is encountered in the bitstring
-//        follow the right reference when a 1 is encountered.
-//        Add the letter corresponding to a leaf node to the output whenever the above traversal hits a leaf.
-//        Begin again at the root for the next letter to decompress.
-
-        StringBuilder message = new StringBuilder();
-        HuffNode curr = trieRoot;
-        int i = 0;
-        while (i < compressedMsg.length) {
-            while (curr.isLeaf()) {
-                if (compressedMsg[i] == 1) {
-                    curr = curr.right;
-                } else if (compressedMsg[i] == 0) {
-                    curr = curr.left;
-                }
-                i++;
-            }
-            message.append(curr.character);
-            curr = trieRoot;
-        }
-        String result = message.toString();
-        return result;
     }
 
 
