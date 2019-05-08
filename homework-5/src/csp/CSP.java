@@ -29,7 +29,7 @@ public class CSP {
      *         indexed by the variable they satisfy, or null if no solution exists.
      */
     public static List<LocalDate> solve (int nMeetings, LocalDate rangeStart, LocalDate rangeEnd, 
-    										Set<DateConstraint> constraints) {
+    						Set<DateConstraint> constraints) {
     	
     	HashMap<Integer, DateVar> variables = new HashMap<Integer, DateVar>();	
     	for (int n = 0; n < nMeetings; n++) {
@@ -44,8 +44,8 @@ public class CSP {
     
     
     private static List<LocalDate> backTracking (HashMap<Integer, DateVar> variables, 
-    												Set<DateConstraint> contstraints, 
-    												HashMap<Integer, LocalDate> assignments) {
+    							Set<DateConstraint> contstraints, 
+    							HashMap<Integer, LocalDate> assignments) {
     	
     	if (assignments.size() == variables.size()) return new ArrayList<>(assignments.values());	
     	DateVar unassigned = null;	
@@ -70,7 +70,7 @@ public class CSP {
     }
     
     private static boolean isValidAssignment(HashMap<Integer, DateVar> variables, 
-    											Set<DateConstraint> contstraints) {
+    						Set<DateConstraint> contstraints) {
     	
     	return false;
     }
