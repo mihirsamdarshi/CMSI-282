@@ -102,13 +102,19 @@ public class CSP {
 	
 	private static ArrayList<LocalDate> getDomain (LocalDate start, LocalDate end) {
 		ArrayList<LocalDate> domain = new ArrayList<LocalDate>();
-        while (start.isBefore(end)) {
-        	domain.add(start);
-        	start = start.plusDays(1);
+		domain.add(start);
+        while (domain.get(domain.size() - 1).isBefore(end)) {
+        	domain.add(domain.get(domain.size() - 1).plusDays(1));
         }
         domain.add(end);
 		return domain;
 	}
+	
+//	private static void nodeConsistency(HashMap<Integer, DateVar> variables, Set<DateConstraint> constraints) {
+//		for (HashMap<Integer, DateVar> v : variables) {
+//			
+//		}
+//	}
 
     private static class DateVar {
     	int meeting;
