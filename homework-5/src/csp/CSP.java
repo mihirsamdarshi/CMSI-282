@@ -75,9 +75,7 @@ public class CSP {
     private static DateVar getUnassigned (HashMap<Integer, DateVar> variables, 
 											HashMap<Integer, LocalDate> assignments) {
     	for (int n : variables.keySet()) {
-    		if (!assignments.containsKey(n)) {
-    			return variables.get(n);
-    		}
+    		if (!assignments.containsKey(n)) return variables.get(n);
     	}
     	return null;
     }
