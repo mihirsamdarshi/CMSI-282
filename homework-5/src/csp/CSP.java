@@ -59,13 +59,10 @@ public class CSP {
     	for (LocalDate date : unassigned.domain) {
     		assignments.put(unassigned.meeting, date);
     		if (validAssignments(assignments, constraints)) {
-
     			List<LocalDate> result = recursiveBackTracking(variables, constraints, assignments);
     			if (result != null) return result;	
-
     		}
-			assignments.remove(unassigned.meeting);
-    		
+			assignments.remove(unassigned.meeting);	
     	}
     	
 		return null;
