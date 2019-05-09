@@ -2,11 +2,9 @@ package csp;
 
 import java.time.LocalDate;
 import java.util.Set;
-import java.util.stream.Collectors;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 
 /**
@@ -34,7 +32,7 @@ public class CSP {
     						Set<DateConstraint> constraints) {
     	
     	
-    	ArrayList<LocalDate> fullDomain = getDomain(rangeStart, rangeEnd);
+    	LinkedHashSet<LocalDate> fullDomain = getDomain(rangeStart, rangeEnd);
     	
     	HashMap<Integer, DateVar> variables = new HashMap<Integer, DateVar>();	
     	for (int n = 0; n < nMeetings; n++) {
@@ -100,11 +98,11 @@ public class CSP {
 		return false;
 	}
 	
-	private static ArrayList<LocalDate> getDomain (LocalDate start, LocalDate end) {
-		ArrayList<LocalDate> domain = new ArrayList<LocalDate>();
-		domain.add(start);
-        while (domain.get(domain.size() - 1).isBefore(end)) {
-        	domain.add(domain.get(domain.size() - 1).plusDays(1));
+	private static LinkedHashSet<LocalDate> getDomain (LocalDate start, LocalDate end) {
+		LinkedHashSet<LocalDate> domain = new LinkedHashSet<LocalDate>();
+        while (start.isBefore(end)) {
+        	domain.add(start);
+        	start = start.plusDays(1);
         }
         domain.add(end);
 		return domain;
@@ -118,9 +116,9 @@ public class CSP {
 
     private static class DateVar {
     	int meeting;
-    	ArrayList<LocalDate> domain;
+    	LinkedHashSet<LocalDate> domain;
     	
-    	DateVar(int meeting, ArrayList<LocalDate> domain) {
+    	DateVar(int meeting, LinkedHashSet<LocalDate> domain) {
     		this.meeting = meeting;
     		this.domain = domain;
     	}
