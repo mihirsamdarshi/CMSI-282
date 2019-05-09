@@ -34,7 +34,7 @@ public class CSP {
     						Set<DateConstraint> constraints) {
     	
     	
-    	Set<LocalDate> fullDomain = rangeStart.datesUntil(rangeEnd.plusDays(1)).collect(Collectors.toSet());
+    	ArrayList<LocalDate> fullDomain = getDomain(rangeStart, rangeEnd);
     	
     	HashMap<Integer, DateVar> variables = new HashMap<Integer, DateVar>();	
     	for (int n = 0; n < nMeetings; n++) {
@@ -99,12 +99,22 @@ public class CSP {
 		}
 		return false;
 	}
+	
+	private static ArrayList<LocalDate> getDomain (LocalDate start, LocalDate end) {
+		ArrayList<LocalDate> domain = new ArrayList<LocalDate>();
+        while (start.isBefore(end)) {
+        	domain.add(start);
+        	start = start.plusDays(1);
+        }
+        domain.add(end);
+		return domain;
+	}
 
     private static class DateVar {
     	int meeting;
-    	Set<LocalDate> domain;
+    	ArrayList<LocalDate> domain;
     	
-    	DateVar(int meeting, Set<LocalDate> domain) {
+    	DateVar(int meeting, ArrayList<LocalDate> domain) {
     		this.meeting = meeting;
     		this.domain = domain;
     	}
