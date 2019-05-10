@@ -30,18 +30,20 @@ public class CSP {
      */
     public static List<LocalDate> solve (int nMeetings, LocalDate rangeStart, LocalDate rangeEnd, 
                 Set<DateConstraint> constraints) {
-      
-      
-      List<LocalDate> fullDomain = getDomain(rangeStart, rangeEnd);
+
       
       List<DateVar> variables = new ArrayList<DateVar>();
 
       for (int n = 0; n < nMeetings; n++) {
-        variables.add(new DateVar(fullDomain));
+        variables.add(new DateVar(getDomain(rangeStart, rangeEnd)));
       }
 
       nodeConsistency(variables, constraints);
       arcConsistency(variables, constraints);
+      
+      for (DateVar d : variables) {
+    	  System.out.println(d.domain.toString());
+      }
       
       return recursiveBackTracking(variables, constraints);
     }
@@ -150,7 +152,6 @@ public class CSP {
         
         for (LocalDate tDate : tailDomain) {
         	if (!atLeastOne(tDate, headDomain, op)) {
-        		System.out.println(tDate);
         		tToRemove.add(tDate);
         	}
         }
@@ -161,6 +162,14 @@ public class CSP {
     	for (LocalDate d : domain) {
     		if (isConsistent(date, d, op)) return true;
     	}
+    	return false;
+    }
+    
+    private static boolean containsEmptyDomain (List<DateVar> variables) {
+    	for (DateVar v : variables) {
+    		if (v.domain.isEmpty()) return true;
+    	}
+    	
     	return false;
     }
 
