@@ -32,13 +32,14 @@ public class CSP {
     						Set<DateConstraint> constraints) {
     	
     	
-    	LinkedHashSet<LocalDate> fullDomain = getDomain(rangeStart, rangeEnd);
+    	List<LocalDate> fullDomain = getDomain(rangeStart, rangeEnd);
     	
     	HashMap<Integer, DateVar> variables = new HashMap<Integer, DateVar>();	
     	for (int n = 0; n < nMeetings; n++) {
     		variables.put(n, new DateVar(n, fullDomain));
     	}
 
+    	nodeConsistency(variables, constraints);
     	
     	return recursiveBackTracking(variables, constraints, new HashMap<>());
     }
@@ -99,8 +100,8 @@ public class CSP {
 		return false;
 	}
 	
-	private static LinkedHashSet<LocalDate> getDomain (LocalDate start, LocalDate end) {
-		LinkedHashSet<LocalDate> domain = new LinkedHashSet<LocalDate>();
+	private static List<LocalDate> getDomain (LocalDate start, LocalDate end) {
+		List<LocalDate> domain = new ArrayList<LocalDate>();
         while (start.isBefore(end)) {
         	domain.add(start);
         	start = start.plusDays(1);
@@ -114,22 +115,22 @@ public class CSP {
 			if (c.arity() != 1) {
 				break;
 			}
-			LinkedHashSet<LocalDate> currDomain = variables.get(c.L_VAL).domain;
-			
+			List<LocalDate> currDomain = variables.get(c.L_VAL).domain;
+			List<LocalDate> toRemove = new ArrayList<LocalDate>();	
 			for (LocalDate d : currDomain) {
 				if (!isConsistent(d, ((UnaryDateConstraint) c).R_VAL, c.OP)) {
-					currDomain.remove(d);
+					toRemove.add(d);
 				}
 			}
-
+			currDomain.removeAll(toRemove);
 		}
 	}
 
     private static class DateVar {
     	int meeting;
-    	LinkedHashSet<LocalDate> domain;
+    	List<LocalDate> domain;
     	
-    	DateVar(int meeting, LinkedHashSet<LocalDate> domain) {
+    	DateVar(int meeting, List<LocalDate> domain) {
     		this.meeting = meeting;
     		this.domain = domain;
     	}
