@@ -110,7 +110,7 @@ public class CSP {
         return domain;
     }
 
-    private static void nodeConsistency(List<DateVar> variables, Set<DateConstraint> constraints) {
+    private static void nodeConsistency (List<DateVar> variables, Set<DateConstraint> constraints) {
         for (DateConstraint c : constraints) {
             if (c.arity() == 1) {
                 List<LocalDate> currDomain = variables.get(c.L_VAL).domain;
@@ -125,7 +125,7 @@ public class CSP {
         }
     }
 
-    private static void arcConsistency(List<DateVar> variables, Set<DateConstraint> constraints) {
+    private static void arcConsistency (List<DateVar> variables, Set<DateConstraint> constraints) {
         for (DateConstraint c: constraints) {        
             if (c.arity() == 2) {
                 List<LocalDate> tailDomain = variables.get(c.L_VAL).domain;
@@ -141,7 +141,7 @@ public class CSP {
             }
     }
     	
-    private static void removeArcDomain(List<LocalDate> tailDomain, List<LocalDate> headDomain, String op) {
+    private static void removeArcDomain (List<LocalDate> tailDomain, List<LocalDate> headDomain, String op) {
         List<LocalDate> tRemove = new ArrayList<LocalDate>();  
 
         for (LocalDate tDate : tailDomain) {
