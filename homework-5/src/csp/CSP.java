@@ -40,7 +40,7 @@ public class CSP {
     	}
 
     	nodeConsistency(variables, constraints);
-//    	arcConsistency(variables, constraints);
+    	arcConsistency(variables, constraints);
     	
     	return recursiveBackTracking(variables, constraints, new HashMap<>());
     }
@@ -156,9 +156,10 @@ public class CSP {
 
         for (LocalDate tDate : tailDomain) {
             for (LocalDate hDate : headDomain) {
-                if (!isConsistent(tDate, hDate, operator)) {
-                    tailToRemove.add(tDate);
+                if (isConsistent(tDate, hDate, operator)) {
+                    break;
                 }
+                tailToRemove.add(tDate);
             }
         }
         tailDomain.removeAll(tailToRemove);
