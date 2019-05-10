@@ -157,9 +157,9 @@ public class CSP {
         tailDomain.removeAll(tToRemove);
     }
     
-    private static boolean atLeastOne (LocalDate date, List<LocalDate> headDomain, String op)  {
-    	for (LocalDate h : headDomain) {
-    		if (isConsistent(date, h, op)) return true;
+    private static boolean atLeastOne (LocalDate date, List<LocalDate> domain, String op)  {
+    	for (LocalDate d : domain) {
+    		if (isConsistent(date, d, op)) return true;
     	}
     	return false;
     }
