@@ -41,9 +41,9 @@ public class CSP {
       nodeConsistency(variables, constraints);
       arcConsistency(variables, constraints);
       
-      for (DateVar d : variables) {
-    	  System.out.println(d.domain.toString());
-      }
+//      for (DateVar d : variables) {
+//    	  System.out.println(d.domain.toString());
+//      }
       
       return recursiveBackTracking(variables, constraints);
     }
@@ -142,20 +142,20 @@ public class CSP {
                 tailDomain = variables.get(((BinaryDateConstraint) c).R_VAL).domain;
                 headDomain = variables.get(c.L_VAL).domain;
                 
-                removeArcDomain(tailDomain, headDomain, c.OP);
+                removeArcDomain(tailDomain, headDomain, reverseOP(c.OP));
             }
         }
     }
 
     private static void removeArcDomain(List<LocalDate> tailDomain, List<LocalDate> headDomain, String op) {
-        List<LocalDate> tToRemove = new ArrayList<LocalDate>();  
+        List<LocalDate> tRemove = new ArrayList<LocalDate>();  
         
         for (LocalDate tDate : tailDomain) {
         	if (!atLeastOne(tDate, headDomain, op)) {
-        		tToRemove.add(tDate);
+        		tRemove.add(tDate);
         	}
         }
-        tailDomain.removeAll(tToRemove);
+        tailDomain.removeAll(tRemove);
     }
     
     private static boolean atLeastOne (LocalDate date, List<LocalDate> domain, String op)  {
@@ -171,6 +171,18 @@ public class CSP {
     	}
     	
     	return false;
+    }
+    
+    private static String reverseOP (String op) {
+        switch (op) {
+	        case "==": return "==";
+	        case "!=": return "!=";
+	        case ">":  return "<";
+	        case "<":  return ">";
+	        case ">=": return "<=";
+	        case "<=": return ">=";
+        }
+        return null;
     }
 
     private static class DateVar {
