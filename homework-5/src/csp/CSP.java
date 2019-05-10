@@ -38,6 +38,7 @@ public class CSP {
     	for (int n = 0; n < nMeetings; n++) {
     		variables.put(n, new DateVar(n, fullDomain));
     	}
+
     	
     	return recursiveBackTracking(variables, constraints, new HashMap<>());
     }
@@ -108,11 +109,21 @@ public class CSP {
 		return domain;
 	}
 	
-//	private static void nodeConsistency(HashMap<Integer, DateVar> variables, Set<DateConstraint> constraints) {
-//		for (HashMap<Integer, DateVar> v : variables) {
-//			
-//		}
-//	}
+	private static void nodeConsistency(HashMap<Integer, DateVar> variables, Set<DateConstraint> constraints) {
+		for (DateConstraint c : constraints) {
+			if (c.arity() != 1) {
+				break;
+			}
+			LinkedHashSet<LocalDate> currDomain = variables.get(c.L_VAL).domain;
+			
+			for (LocalDate d : currDomain) {
+				if (!isConsistent(d, ((UnaryDateConstraint) c).R_VAL, c.OP)) {
+					currDomain.remove(d);
+				}
+			}
+
+		}
+	}
 
     private static class DateVar {
     	int meeting;
