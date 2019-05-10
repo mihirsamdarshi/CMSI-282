@@ -40,6 +40,7 @@ public class CSP {
     	}
 
     	nodeConsistency(variables, constraints);
+//    	arcConsistency(variables, constraints);
     	
     	return recursiveBackTracking(variables, constraints, new HashMap<>());
     }
@@ -112,9 +113,7 @@ public class CSP {
 	
 	private static void nodeConsistency(HashMap<Integer, DateVar> variables, Set<DateConstraint> constraints) {
 		for (DateConstraint c : constraints) {
-			if (c.arity() != 1) {
-				break;
-			}
+			if (c.arity() != 1) break;
 			List<LocalDate> currDomain = variables.get(c.L_VAL).domain;
 			List<LocalDate> toRemove = new ArrayList<LocalDate>();	
 			for (LocalDate d : currDomain) {
@@ -125,6 +124,45 @@ public class CSP {
 			currDomain.removeAll(toRemove);
 		}
 	}
+	
+//	private static void arcConsistency(HashMap<Integer, DateVar> variables, Set<DateConstraint> constraints) {
+//		for (DateConstraint c : constraints) {
+//			if (c.arity() != 2) break;
+//			
+//		}
+//	}
+	
+    private static void arcConsistency(HashMap<Integer, DateVar> variables, Set<DateConstraint> constraints) {
+        for (DateConstraint c: constraints) {
+            
+            if (c.arity() != 2) break;
+
+            List<LocalDate> tailDomain = variables.get(c.L_VAL).domain;
+            List<LocalDate> headDomain = variables.get(((BinaryDateConstraint) c).R_VAL).domain;
+            
+            removeArcDomain(tailDomain, headDomain, c.OP);
+            
+            // switch the domains
+            tailDomain = variables.get(((BinaryDateConstraint) c).R_VAL).domain;
+            headDomain = variables.get(c.L_VAL).domain;
+            
+            removeArcDomain(tailDomain, headDomain, c.OP);
+
+        }
+    }
+    
+    private static void removeArcDomain(List<LocalDate> tailDomain, List<LocalDate> headDomain, String operator) {
+        List<LocalDate> tailToRemove = new ArrayList<LocalDate>();  
+
+        for (LocalDate tDate : tailDomain) {
+            for (LocalDate hDate : headDomain) {
+                if (!isConsistent(tDate, hDate, operator)) {
+                    tailToRemove.add(tDate);
+                }
+            }
+        }
+        tailDomain.removeAll(tailToRemove);
+    }
 
     private static class DateVar {
     	int meeting;
