@@ -21,7 +21,7 @@ public class CSP {
      * Public interface for the CSP solver in which the number of meetings,
      * range of allowable dates for each meeting, and constraints on meeting
      * times are specified.
-     * @param nMeetings The number of meetings that must be scheduled, indexed from 0 to	 n-1
+     * @param nMeetings The number of meetings that must be scheduled, indexed from 0 to   n-1
      * @param rangeStart The start date (inclusive) of the domains of each of the n meeting-variables
      * @param rangeEnd The end date (inclusive) of the domains of each of the n meeting-variables
      * @param constraints Date constraints on the meeting times (unary and binary for this assignment)
@@ -29,113 +29,110 @@ public class CSP {
      *         indexed by the variable they satisfy, or null if no solution exists.
      */
     public static List<LocalDate> solve (int nMeetings, LocalDate rangeStart, LocalDate rangeEnd, 
-    						Set<DateConstraint> constraints) {
-    	
-    	
-    	List<LocalDate> fullDomain = getDomain(rangeStart, rangeEnd);
-    	
-    	HashMap<Integer, DateVar> variables = new HashMap<Integer, DateVar>();	
-    	for (int n = 0; n < nMeetings; n++) {
-    		variables.put(n, new DateVar(n, fullDomain));
-    	}
+                Set<DateConstraint> constraints) {
+      
+      
+      List<LocalDate> fullDomain = getDomain(rangeStart, rangeEnd);
+      
+      List<DateVar> variables = new ArrayList<DateVar>();
 
-    	nodeConsistency(variables, constraints);
-    	arcConsistency(variables, constraints);
-    	
-    	return recursiveBackTracking(variables, constraints, new HashMap<>());
+      for (int n = 0; n < nMeetings; n++) {
+        variables.add(new DateVar(fullDomain));
+      }
+
+//      nodeConsistency(variables, constraints);
+//      arcConsistency(variables, constraints);
+      
+      return recursiveBackTracking(variables, constraints);
     }
     
     
-    private static List<LocalDate> recursiveBackTracking (HashMap<Integer, DateVar> variables, 
-    							Set<DateConstraint> constraints, 
-    							HashMap<Integer, LocalDate> assignments) {
+    private static List<LocalDate> recursiveBackTracking (List<DateVar> variables, Set<DateConstraint> constraints) {
 
-        if (variables.size() == assignments.size() && validAssignments(assignments, constraints)) {
-        	return new ArrayList<>(assignments.values());
+        if (variables.get(variables.size() - 1).date != null && validAssignments(variables, constraints)) {
+            List<LocalDate> soln = new ArrayList<LocalDate>();
+            for (DateVar v : variables) {
+                soln.add(v.date);
+            }
+            return soln;
         }
-    	
-    	DateVar unassigned = getUnassigned(variables, assignments);	
-    	if (unassigned == null) return null;
-    	
-    	for (LocalDate date : unassigned.domain) {
-    		assignments.put(unassigned.meeting, date);
-    		if (validAssignments(assignments, constraints)) {
-    			List<LocalDate> result = recursiveBackTracking(variables, constraints, assignments);
-    			if (result != null) return result;	
-    		}
-			assignments.remove(unassigned.meeting);	
-    	}
-    	
-		return null;
-    	
+      
+      DateVar unassigned = getUnassigned(variables); 
+      if (unassigned == null) return null;
+      
+      for (LocalDate date : unassigned.domain) {
+    	  unassigned.date = date;
+          if (validAssignments(variables, constraints)) {
+              List<LocalDate> result = recursiveBackTracking(variables, constraints);
+              if (result != null) return result;
+            }
+          unassigned.date = null;
+      }
+      
+    return null;
+      
     }
     
-    private static DateVar getUnassigned (HashMap<Integer, DateVar> variables, 
-											HashMap<Integer, LocalDate> assignments) {
-    	for (int n : variables.keySet()) {
-    		if (!assignments.containsKey(n)) return variables.get(n);
-    	}
-    	return null;
+    private static DateVar getUnassigned (List<DateVar> variables) {
+      for (DateVar v : variables) {
+        if (v.date == null) return v;
+      }
+      return null;
     }
 
-    private static boolean validAssignments (HashMap<Integer, LocalDate> assignments, Set<DateConstraint> constraints) {
-		for (DateConstraint c : constraints) {
-			LocalDate lDate = assignments.get(c.L_VAL);
-			LocalDate rDate = c.arity() == 1 ? ((UnaryDateConstraint) c).R_VAL
-					: assignments.get(((BinaryDateConstraint) c).R_VAL);
-			if (lDate == null || rDate == null) continue;
-			if (!isConsistent(lDate, rDate, c.OP)) return false;
-		}
-		return true;
+    private static boolean validAssignments (List<DateVar> variables, Set<DateConstraint> constraints) {
+    for (DateConstraint c : constraints) {
+      LocalDate lDate = variables.get(c.L_VAL).date;
+      LocalDate rDate = c.arity() == 1 ? ((UnaryDateConstraint) c).R_VAL
+          : variables.get(((BinaryDateConstraint) c).R_VAL).date;
+      if (lDate == null || rDate == null) continue;
+      if (!isConsistent(lDate, rDate, c.OP)) return false;
+    }
+    return true;
     }
     
-	private static boolean isConsistent (LocalDate lDate, LocalDate rDate, String op) {
-		switch (op) {
-			case "==": if (lDate.isEqual(rDate))  return true; break;
-			case "!=": if (!lDate.isEqual(rDate)) return true; break;	
-			case ">":  if (lDate.isAfter(rDate))  return true; break;
-			case "<":  if (lDate.isBefore(rDate)) return true; break;
-			case ">=": if (lDate.isAfter(rDate) || lDate.isEqual(rDate))  return true; break;
-			case "<=": if (lDate.isBefore(rDate) || lDate.isEqual(rDate)) return true; break;
-		}
-		return false;
-	}
-	
-	private static List<LocalDate> getDomain (LocalDate start, LocalDate end) {
-		List<LocalDate> domain = new ArrayList<LocalDate>();
+  private static boolean isConsistent (LocalDate lDate, LocalDate rDate, String op) {
+    switch (op) {
+      case "==": if (lDate.isEqual(rDate))  return true; break;
+      case "!=": if (!lDate.isEqual(rDate)) return true; break; 
+      case ">":  if (lDate.isAfter(rDate))  return true; break;
+      case "<":  if (lDate.isBefore(rDate)) return true; break;
+      case ">=": if (lDate.isAfter(rDate) || lDate.isEqual(rDate))  return true; break;
+      case "<=": if (lDate.isBefore(rDate) || lDate.isEqual(rDate)) return true; break;
+    }
+    return false;
+  }
+  
+  private static List<LocalDate> getDomain (LocalDate start, LocalDate end) {
+    List<LocalDate> domain = new ArrayList<LocalDate>();
         while (start.isBefore(end)) {
-        	domain.add(start);
-        	start = start.plusDays(1);
+          domain.add(start);
+          start = start.plusDays(1);
         }
         domain.add(end);
-		return domain;
-	}
-	
-	private static void nodeConsistency(HashMap<Integer, DateVar> variables, Set<DateConstraint> constraints) {
-		for (DateConstraint c : constraints) {
-			if (c.arity() != 1) break;
-			List<LocalDate> currDomain = variables.get(c.L_VAL).domain;
-			List<LocalDate> toRemove = new ArrayList<LocalDate>();	
-			for (LocalDate d : currDomain) {
-				if (!isConsistent(d, ((UnaryDateConstraint) c).R_VAL, c.OP)) {
-					toRemove.add(d);
-				}
-			}
-			currDomain.removeAll(toRemove);
-		}
-	}
-	
-//	private static void arcConsistency(HashMap<Integer, DateVar> variables, Set<DateConstraint> constraints) {
-//		for (DateConstraint c : constraints) {
-//			if (c.arity() != 2) break;
-//			
-//		}
-//	}
-	
+    return domain;
+  }
+  
+  private static void nodeConsistency(HashMap<Integer, DateVar> variables, Set<DateConstraint> constraints) {
+    for (DateConstraint c : constraints) {
+      if (c.arity() != 1) break;
+      List<LocalDate> currDomain = variables.get(c.L_VAL).domain;
+      List<LocalDate> toRemove = new ArrayList<LocalDate>();  
+      for (LocalDate d : currDomain) {
+        if (!isConsistent(d, ((UnaryDateConstraint) c).R_VAL, c.OP)) {
+          toRemove.add(d);
+        }
+      }
+      currDomain.removeAll(toRemove);
+    }
+  }
+  
     private static void arcConsistency(HashMap<Integer, DateVar> variables, Set<DateConstraint> constraints) {
         for (DateConstraint c: constraints) {
             
-            if (c.arity() != 2) break;
+            if (c.arity() == 1) {
+                continue;
+            }
 
             List<LocalDate> tailDomain = variables.get(c.L_VAL).domain;
             List<LocalDate> headDomain = variables.get(((BinaryDateConstraint) c).R_VAL).domain;
@@ -150,29 +147,34 @@ public class CSP {
 
         }
     }
-    
+
     private static void removeArcDomain(List<LocalDate> tailDomain, List<LocalDate> headDomain, String operator) {
         List<LocalDate> tailToRemove = new ArrayList<LocalDate>();  
 
+        boolean tailDomainConsistent = true;
+
         for (LocalDate tDate : tailDomain) {
-            for (LocalDate hDate : headDomain) {
-                if (isConsistent(tDate, hDate, operator)) {
-                    break;
+            for (int i = 0; i < headDomain.size(); i++) {
+                LocalDate hDate = headDomain.get(i);
+                if (!isConsistent(tDate, hDate, operator)) {
+                    tailDomainConsistent = false;
                 }
-                tailToRemove.add(tDate);
+                if (i == headDomain.size() - 1 & !tailDomainConsistent) {
+                    tailToRemove.add(tDate);
+                }
             }
         }
-        tailDomain.removeAll(tailToRemove);
+        tailDomain.remove(tailToRemove);
     }
 
     private static class DateVar {
-    	int meeting;
-    	List<LocalDate> domain;
-    	
-    	DateVar(int meeting, List<LocalDate> domain) {
-    		this.meeting = meeting;
-    		this.domain = domain;
-    	}
+    	LocalDate date;
+        List<LocalDate> domain;
+        
+      
+      DateVar(List<LocalDate> domain) {
+        this.domain = domain;
+      }
 
     }
     
