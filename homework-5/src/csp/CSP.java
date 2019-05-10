@@ -40,8 +40,8 @@ public class CSP {
         variables.add(new DateVar(fullDomain));
       }
 
-//      nodeConsistency(variables, constraints);
-//      arcConsistency(variables, constraints);
+      nodeConsistency(variables, constraints);
+      arcConsistency(variables, constraints);
       
       return recursiveBackTracking(variables, constraints);
     }
@@ -81,14 +81,14 @@ public class CSP {
     }
 
     private static boolean validAssignments (List<DateVar> variables, Set<DateConstraint> constraints) {
-    for (DateConstraint c : constraints) {
-      LocalDate lDate = variables.get(c.L_VAL).date;
-      LocalDate rDate = c.arity() == 1 ? ((UnaryDateConstraint) c).R_VAL
-          : variables.get(((BinaryDateConstraint) c).R_VAL).date;
-      if (lDate == null || rDate == null) continue;
-      if (!isConsistent(lDate, rDate, c.OP)) return false;
-    }
-    return true;
+	    for (DateConstraint c : constraints) {
+	      LocalDate lDate = variables.get(c.L_VAL).date;
+	      LocalDate rDate = c.arity() == 1 ? ((UnaryDateConstraint) c).R_VAL
+	          : variables.get(((BinaryDateConstraint) c).R_VAL).date;
+	      if (lDate == null || rDate == null) continue;
+	      if (!isConsistent(lDate, rDate, c.OP)) return false;
+	    }
+	    return true;
     }
     
   private static boolean isConsistent (LocalDate lDate, LocalDate rDate, String op) {
@@ -104,67 +104,64 @@ public class CSP {
   }
   
   private static List<LocalDate> getDomain (LocalDate start, LocalDate end) {
-    List<LocalDate> domain = new ArrayList<LocalDate>();
-        while (start.isBefore(end)) {
-          domain.add(start);
-          start = start.plusDays(1);
-        }
-        domain.add(end);
-    return domain;
+	List<LocalDate> domain = new ArrayList<LocalDate>();
+	while (start.isBefore(end)) {
+	  domain.add(start);
+	  start = start.plusDays(1);
+	}
+	domain.add(end);
+	return domain;
   }
   
-  private static void nodeConsistency(HashMap<Integer, DateVar> variables, Set<DateConstraint> constraints) {
+  private static void nodeConsistency(List<DateVar> variables, Set<DateConstraint> constraints) {
     for (DateConstraint c : constraints) {
-      if (c.arity() != 1) break;
-      List<LocalDate> currDomain = variables.get(c.L_VAL).domain;
-      List<LocalDate> toRemove = new ArrayList<LocalDate>();  
-      for (LocalDate d : currDomain) {
-        if (!isConsistent(d, ((UnaryDateConstraint) c).R_VAL, c.OP)) {
-          toRemove.add(d);
+      if (c.arity() == 1) {
+          List<LocalDate> currDomain = variables.get(c.L_VAL).domain;
+          List<LocalDate> toRemove = new ArrayList<LocalDate>();  
+          for (LocalDate d : currDomain) {
+            if (!isConsistent(d, ((UnaryDateConstraint) c).R_VAL, c.OP)) {
+              toRemove.add(d);
+            }
+          }
+          currDomain.removeAll(toRemove);
         }
       }
-      currDomain.removeAll(toRemove);
-    }
   }
   
-    private static void arcConsistency(HashMap<Integer, DateVar> variables, Set<DateConstraint> constraints) {
-        for (DateConstraint c: constraints) {
-            
-            if (c.arity() == 1) {
-                continue;
+    private static void arcConsistency(List<DateVar> variables, Set<DateConstraint> constraints) {
+        for (DateConstraint c: constraints) {        
+            if (c.arity() == 2) {
+                List<LocalDate> tailDomain = variables.get(c.L_VAL).domain;
+                List<LocalDate> headDomain = variables.get(((BinaryDateConstraint) c).R_VAL).domain;
+                
+                removeArcDomain(tailDomain, headDomain, c.OP);
+                
+                // switch the domains
+                tailDomain = variables.get(((BinaryDateConstraint) c).R_VAL).domain;
+                headDomain = variables.get(c.L_VAL).domain;
+                
+                removeArcDomain(tailDomain, headDomain, c.OP);
             }
-
-            List<LocalDate> tailDomain = variables.get(c.L_VAL).domain;
-            List<LocalDate> headDomain = variables.get(((BinaryDateConstraint) c).R_VAL).domain;
-            
-            removeArcDomain(tailDomain, headDomain, c.OP);
-            
-            // switch the domains
-            tailDomain = variables.get(((BinaryDateConstraint) c).R_VAL).domain;
-            headDomain = variables.get(c.L_VAL).domain;
-            
-            removeArcDomain(tailDomain, headDomain, c.OP);
-
         }
     }
 
-    private static void removeArcDomain(List<LocalDate> tailDomain, List<LocalDate> headDomain, String operator) {
-        List<LocalDate> tailToRemove = new ArrayList<LocalDate>();  
-
-        boolean tailDomainConsistent = true;
-
+    private static void removeArcDomain(List<LocalDate> tailDomain, List<LocalDate> headDomain, String op) {
+        List<LocalDate> tToRemove = new ArrayList<LocalDate>();  
+        
         for (LocalDate tDate : tailDomain) {
-            for (int i = 0; i < headDomain.size(); i++) {
-                LocalDate hDate = headDomain.get(i);
-                if (!isConsistent(tDate, hDate, operator)) {
-                    tailDomainConsistent = false;
-                }
-                if (i == headDomain.size() - 1 & !tailDomainConsistent) {
-                    tailToRemove.add(tDate);
-                }
-            }
+        	if (!atLeastOne(tDate, headDomain, op)) {
+        		System.out.println(tDate);
+        		tToRemove.add(tDate);
+        	}
         }
-        tailDomain.remove(tailToRemove);
+        tailDomain.removeAll(tToRemove);
+    }
+    
+    private static boolean atLeastOne (LocalDate date, List<LocalDate> headDomain, String op)  {
+    	for (LocalDate h : headDomain) {
+    		if (isConsistent(date, h, op)) return true;
+    	}
+    	return false;
     }
 
     private static class DateVar {
